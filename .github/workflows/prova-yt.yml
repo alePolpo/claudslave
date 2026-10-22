@@ -2,12 +2,16 @@ name: prova-yt
 on: workflow_dispatch
 jobs:
   prova:
+    strategy:
+      matrix: {n: [1, 2, 3, 4]}
     runs-on: ubuntu-latest
     steps:
-      - run: pip install -q "yt-dlp[default]" && yt-dlp --version && node --version
+      - run: pip install -q "yt-dlp[default]"
       - run: |
-          for u in https://www.youtube.com/watch?v=aqz-KE-bpKQ https://www.youtube.com/watch?v=dQw4w9WgXcQ; do
-            time yt-dlp --js-runtimes node -f "bv*+ba/b" --merge-output-format mp4 -o "/tmp/%(id)s.%(ext)s" \
-              --print "after_move:%(format_id)s %(resolution)s %(fps)s %(vcodec)s" "$u" 2>&1 | tail -4
+          for c in default tv_simply mweb web_safari tv,web_safari; do
+            for v in aqz-KE-bpKQ dQw4w9WgXcQ jNQXAC9IVRw LXb3EKWsInQ 9bZkp7q19f0; do
+              a=(); [ $c != default ] && a=(--extractor-args "youtube:player_client=$c")
+              r=$(yt-dlp --js-runtimes node "${a[@]}" -f "bv*+ba/b" --print "%(format_id)s %(height)sp" "https://youtu.be/$v" 2>&1 | grep -oE "^[0-9a-z-]+\+[0-9a-z-]+ [0-9]+p|^[0-9]+ [0-9]+p|Sign in|ERROR.{0,60}" | head -1)
+              echo "RIS $c $v -> $r"
+            done
           done
-          ls -l /tmp/*.mp4
