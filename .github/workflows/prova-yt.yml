@@ -1,0 +1,13 @@
+name: prova-yt
+on: workflow_dispatch
+jobs:
+  prova:
+    runs-on: ubuntu-latest
+    steps:
+      - run: pip install -q "yt-dlp[default]" && yt-dlp --version && node --version
+      - run: |
+          for u in https://www.youtube.com/watch?v=aqz-KE-bpKQ https://www.youtube.com/watch?v=dQw4w9WgXcQ; do
+            time yt-dlp --js-runtimes node -f "bv*+ba/b" --merge-output-format mp4 -o "/tmp/%(id)s.%(ext)s" \
+              --print "after_move:%(format_id)s %(resolution)s %(fps)s %(vcodec)s" "$u" 2>&1 | tail -4
+          done
+          ls -l /tmp/*.mp4
